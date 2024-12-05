@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mysample.mapper.MemberMapper">
+    <insert id="insertMember" parameterType="com.example.mysample.dto.MemberVo">
+        INSERT INTO
+        tbl_member (m_email, m_pw, m_reg_date, m_mod_date)
+        VALUES (#{m_email}, #{m_pw}, now(), now())
+    </insert>
+    <insert id="insertOauthMember" parameterType="com.example.mysample.dto.MemberVo" useGeneratedKeys="true" keyProperty="m_no">
+        INSERT INTO
+        tbl_member (m_email, m_name, m_googleId, m_kakaoId, m_loginType, m_reg_date, m_mod_date)
+        VALUES (#{m_email}, #{m_name}, #{m_googleId}, #{m_kakaoId}, #{m_loginType}, now(), now())
+    </insert>
+    <select id="selectMember" resultType="com.example.mysample.dto.MemberVo" parameterType="String">
+        SELECT * FROM tbl_member
+        WHERE m_email = #{m_email}
+    </select>
+    <update id="updateMember" parameterType="com.example.mysample.dto.MemberVo">
+        UPDATE tbl_member
+        SET m_pw=#{m_pw}, m_name=#{m_name}, m_gender=#{m_gender}, m_hp1=#{m_hp1}, m_hp2=#{m_hp2}, m_hp3=#{m_hp3}, m_zipcode=#{m_zipcode}, m_address=#{m_address}, m_address_sub=#{m_address_sub}, m_loginType=#{m_loginType}
+        WHERE m_no=#{m_no}
+    </update>
+    <delete id="deleteMember">
+        DELETE FROM tbl_member
+        WHERE m_no=#{m_no}
+    </delete>
+
+</mapper>

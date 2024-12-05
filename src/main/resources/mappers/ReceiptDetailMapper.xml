@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mysample.mapper.ReceiptDetailMapper">
+    <insert id="insertReceiptDetail" parameterType="com.example.mysample.dto.ReceiptDto">
+        INSERT INTO tbl_receipt_detail (receipt_id, g_no, rd_reg_date)
+        VALUES
+        <foreach collection="g_nos" item="g_no" separator=",">
+            (#{receipt_id}, #{g_no}, now())
+        </foreach>
+    </insert>
+
+    <select id="selectMyReceiptDetail" resultType="com.example.mysample.dto.ReceiptDetailDto">
+        SELECT *, rd.g_no FROM tbl_receipt_detail AS rd
+        JOIN tbl_goods AS gd ON rd.g_no = gd.g_no
+        LEFT JOIN tbl_goods_image GM ON GM.g_no = gd.g_no
+        AND GM.img_no=( SELECT MIN(GM2.img_no)
+        FROM tbl_goods_image GM2
+        WHERE GM2.g_no = gd.g_no )
+        WHERE receipt_id =  #{receipt_id}
+        ORDER BY rd.receipt_detail_no DESC
+    </select>
+
+    <update id="updateReceiptDetailReviewed">
+        UPDATE tbl_receipt_detail
+        SET reviewed = "Y"
+        WHERE receipt_detail_no = #{receipt_detail_no}
+    </update>
+
+</mapper>

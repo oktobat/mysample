@@ -1,0 +1,37 @@
+@charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+/*
+  .noto-sans-kr-<uniquifier> {
+  font-family: "Noto Sans KR", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+}
+*/
+/*
+	메인 칼라 : #8c0000(진한적갈색), #eb1414(선명한 빨간색)
+	서브 칼라 : #000(검정색), #4c4c4c(어두운그레이), #f9f0ec(연핑크), #f4cbc9(밝은살구색)
+*/
+
+
+* { margin:0; padding:0; box-sizing:border-box }
+body { font-size:15px; line-height:1.2; font-family: "Noto Sans KR", sans-serif; }
+a { color:inherit; text-decoration:none; display:inline-block }
+img { max-width:100%; vertical-align:middle }
+ul { list-style:none }
+table { width:100%; table-layout:fixed; border-collapse:collapse; }
+button, input[type=button], input[type=reset], input[type=submit] { cursor:pointer;
+    background:none; border:none;
+}
+input { outline:none }
+.red_btn { background:#eb1414; color:#fff; font-size:14px; width:100%}
+.black_btn { background:#000; color:#fff; font-size:14px; width:100%}
+.inner { max-width:980px; margin:0 auto; }
+.blind { position:absolute; width:1px; height:1px; overflow:hidden; font-size:0px; text-indent:-9999px; }
+.title h2 { font-size:50px; text-align:center;
+margin:50px 0; }
+
+.pagination { margin:30px 0; display:flex; justify-content:center; align-items:center  }
+.pagination .page-btn { width:30px; height:30px; margin:0 3px; border-radius:3px; border:none; border:1px solid #8c0000;  }
+.pagination .page-btn.on { background-color:#8c0000; border-color:#8c0000; color:#fff }
+.pagination .page-btn.pn-btn { width:50px; }

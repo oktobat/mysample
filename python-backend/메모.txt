@@ -1,0 +1,10 @@
+Tesseract 설치 : 광학문자 인식 엔진 설치
+설치방법 : https://coding-yesung.tistory.com/239
+
+가상환경 설정 : python -m venv ocr_env
+가상환경 활성화 : .\ocr_env\Scripts\activate
+가상환경 비활성화 : deactivate
+의존성 설치 : pip install flask flask-cors pillow pytesseract requests opencv-python
+협업을 위해 위의 의존성 목록 파일 작성 : pip freeze > requirements.txt
+목록파일과 동일한 의존성 설치 : pip install -r requirements.txt
+목록 설치 확인 : pip list

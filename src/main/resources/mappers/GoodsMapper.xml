@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mysample.mapper.GoodsMapper">
+
+    <!-- 상품 유형에 따른 상품 목록 조회 -->
+    <select id="selectMainGoods" parameterType="String" resultType="com.example.mysample.dto.GoodsDto">
+        SELECT
+        GS.g_no,
+        GS.g_category,
+        GS.g_type,
+        GS.g_name,
+        GS.g_price,
+        GS.g_inventory,
+        GS.g_reg_date,
+        GS.g_mod_date,
+        GM.img_no,
+        GM.img_url,
+        COUNT(R.review_no) AS review_count,
+        COALESCE(AVG(R.rating), 0) AS average_rating
+        FROM
+        tbl_goods GS
+        LEFT JOIN
+        tbl_goods_image GM ON GS.g_no = GM.g_no
+        AND GM.img_no = ( SELECT MIN(GM2.img_no) FROM tbl_goods_image GM2 WHERE GM2.g_no = GS.g_no )
+        LEFT JOIN
+        tbl_review R ON GS.g_no = R.g_no
+        WHERE
+        GS.g_type = #{g_type}
+        GROUP BY
+        GS.g_no, GS.g_category, GS.g_type, GS.g_name, GS.g_code,
+        GS.g_price, GS.g_inventory, GS.g_reg_date, GS.g_mod_date,
+        GM.img_no, GM.img_url
+        ORDER BY
+        GS.g_no DESC
+    </select>
+
+    <select id="selectGoodsList" resultType="com.example.mysample.dto.GoodsDto">
+        SELECT *, COUNT(R.g_no) AS review_count, COALESCE(AVG(R.rating), 0) AS average_rating FROM tbl_goods GS
+        LEFT JOIN tbl_goods_image GM ON GS.g_no = GM.g_no
+        AND GM.img_no = ( SELECT MIN(GM2.img_no) FROM tbl_goods_image GM2 WHERE GM2.g_no = GS.g_no )
+        LEFT JOIN tbl_review R ON GS.g_no = R.g_no
+        WHERE GS.g_category = #{g_category}
+        GROUP BY GS.g_no
+        ORDER BY GS.g_no DESC
+        LIMIT #{scale} OFFSET #{pNum}
+    </select>
+
+    <select id="selectSearchGoodsList" resultType="com.example.mysample.dto.GoodsDto">
+        SELECT *, COUNT(R.g_no) AS review_count, COALESCE(AVG(R.rating), 0) AS average_rating FROM tbl_goods GS
+        LEFT JOIN tbl_goods_image GM ON GS.g_no = GM.g_no
+        AND GM.img_no = ( SELECT MIN(GM2.img_no) FROM tbl_goods_image GM2 WHERE GM2.g_no = GS.g_no )
+        LEFT JOIN tbl_review R ON GS.g_no = R.g_no
+        WHERE GS.g_name  LIKE CONCAT('%', #{keyword}, '%')
+        GROUP BY GS.g_no
+        ORDER BY GS.g_no DESC
+        LIMIT #{scale} OFFSET #{pNum}
+    </select>
+
+    <select id="selectGoodsCount" resultType="int">
+        SELECT Count(*) FROM tbl_goods
+        WHERE g_category = #{g_category}
+    </select>
+
+    <select id="selectSearchGoodsCount" resultType="int">
+        SELECT Count(*) FROM tbl_goods
+        WHERE g_name  LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
+    <insert id="insertNewGoods" parameterType="com.example.mysample.dto.GoodsDto" useGeneratedKeys="true" keyProperty="g_no">
+        INSERT INTO tbl_goods (
+        g_category, g_type, g_name, g_code, g_price,
+        g_inventory, g_reg_date, g_mod_date
+        ) VALUES (
+        #{g_category}, #{g_type}, #{g_name}, #{g_code}, #{g_price},
+        #{g_inventory}, now(), now()
+        )
+    </insert>
+
+    <update id="updateGoods">
+        UPDATE tbl_goods
+        SET g_category = #{g_category},
+        g_type = #{g_type},
+        g_name = #{g_name},
+        g_code = #{g_code},
+        g_price = #{g_price},
+        g_inventory = #{g_inventory},
+        g_mod_date = now()
+        WHERE g_no = #{g_no}
+    </update>
+
+    <delete id="deleteGoods" parameterType="long">
+        DELETE FROM tbl_goods
+        WHERE g_no = #{g_no}
+    </delete>
+
+    <update id="updateGoodsInventory" parameterType="com.example.mysample.dto.OrderDetailVo">
+        UPDATE tbl_goods
+        SET g_inventory = g_inventory - #{order_qty}
+        WHERE g_no = #{g_no} AND g_inventory >= #{order_qty}
+    </update>
+
+</mapper>

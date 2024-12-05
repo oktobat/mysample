@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mysample.mapper.GoodsImageMapper">
+
+    <insert id="insertDetailImage">
+        INSERT INTO tbl_goods_image (
+        g_no, img_url, img_reg_date, img_mod_date
+        ) VALUES
+        <foreach collection="images" item="image" separator=",">
+            ( #{g_no}, #{image}, now(), now() )
+        </foreach>
+    </insert>
+
+    <select id="selectImages" resultType="com.example.mysample.dto.GoodsImageVo">
+        SELECT * FROM tbl_goods_image WHERE g_no = #{g_no}
+    </select>
+
+    <update id="updateImage">
+        UPDATE tbl_goods_image
+        SET img_url = #{img_url}
+        WHERE img_no = #{img_no}
+    </update>
+
+    <delete id="deleteGoodsImage">
+        DELETE FROM tbl_goods_image
+        WHERE img_no=#{img_no}
+    </delete>
+
+    <insert id="insertImage">
+        INSERT INTO tbl_goods_image (g_no, img_url, img_reg_date, img_mod_date)
+        VALUES (#{g_no}, #{img_url}, now(), now())
+    </insert>
+
+</mapper>

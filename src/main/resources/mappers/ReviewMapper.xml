@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mysample.mapper.ReviewMapper">
+
+    <insert id="insertNewReview" useGeneratedKeys="true" keyProperty="review_no" parameterType="com.example.mysample.dto.ReviewVo">
+        INSERT INTO tbl_review (
+        comment, rating, g_no, order_detail_no, receipt_detail_no, m_no, rv_reg_date, rv_mod_date
+        ) VALUES (
+        #{comment}, #{rating}, #{g_no}, #{order_detail_no}, #{receipt_detail_no}, #{m_no}, now(), now()
+        )
+    </insert>
+
+    <select id="selectPhotoReviewList" resultType="com.example.mysample.dto.ReviewVo">
+        SELECT *, GROUP_CONCAT(RM.img_url SEPARATOR ',') AS images
+        FROM tbl_review R
+        JOIN tbl_review_image RM ON RM.review_no = R.review_no
+        JOIN tbl_member M ON M.m_no = R.m_no
+        WHERE R.g_no = #{g_no}
+        GROUP BY R.review_no
+        ORDER BY R.review_no DESC
+        LIMIT #{scale} OFFSET #{pNum}
+    </select>
+
+    <select id="selectPhotoReviewCount" resultType="int">
+        SELECT COUNT(*)
+        FROM (
+        SELECT R.review_no
+        FROM tbl_review R
+        JOIN tbl_member M ON M.m_no = R.m_no
+        JOIN tbl_review_image RM ON RM.review_no = R.review_no
+        WHERE R.g_no = #{g_no}
+        GROUP BY R.review_no
+        ) AS review_count
+    </select>
+
+    <select id="selectTextReviewList" resultType="com.example.mysample.dto.ReviewVo" parameterType="hashmap">
+        SELECT * FROM tbl_review R
+        LEFT JOIN tbl_review_image RM ON RM.review_no = R.review_no
+        JOIN tbl_member M ON M.m_no = R.m_no
+        WHERE R.g_no = #{g_no} AND RM.review_no IS NULL
+        ORDER BY R.review_no DESC
+        LIMIT #{scale} OFFSET #{pNum}
+    </select>
+
+    <select id="selectTextReviewCount" resultType="int">
+        SELECT Count(*) FROM tbl_review R
+        LEFT JOIN tbl_review_image RM ON RM.review_no = R.review_no
+        WHERE R.g_no = #{g_no} AND RM.review_no IS NULL
+    </select>
+
+    <select id="selectMyReviewList" resultType="com.example.mysample.dto.ReviewVo">
+        SELECT * FROM tbl_order O
+        LEFT JOIN tbl_order_detail OD ON OD.order_no = O.order_no
+        LEFT JOIN tbl_review R ON R.order_detail_no = OD.order_detail_no
+        LEFT JOIN tbl_goods GS ON GS.g_no = R.g_no
+        WHERE O.m_no = #{m_no}
+        ORDER BY OD.order_detail_no DESC
+    </select>
+
+    <update id="updateReview" parameterType="com.example.mysample.dto.ReviewVo">
+        UPDATE tbl_review
+        SET comment=#{comment}, rating=#{rating}, rv_mod_date=now()
+        WHERE review_no = #{review_no}
+    </update>
+
+</mapper>

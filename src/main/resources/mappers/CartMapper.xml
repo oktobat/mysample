@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mysample.mapper.CartMapper">
+    <select id="selectCartItemQty" resultType="int">
+        SELECT COALESCE(SUM(cart_qty), 0)
+        FROM tbl_cart
+        WHERE g_no = #{g_no} AND m_no = #{m_no}
+    </select>
+
+    <insert id="insertCart" parameterType="com.example.mysample.dto.CartVo">
+        INSERT INTO tbl_cart (m_no, g_no, cart_qty)
+        VALUES (#{m_no}, #{g_no}, #{cart_qty})
+        ON DUPLICATE KEY UPDATE cart_qty = cart_qty + #{cart_qty}
+    </insert>
+
+    <select id="selectCartCount" resultType="int">
+        SELECT Count(*) FROM tbl_cart
+        WHERE m_no = #{m_no}
+    </select>
+
+    <select id="selectCartList" resultType="com.example.mysample.dto.CartVo" parameterType="int">
+        SELECT * FROM tbl_cart C
+        JOIN tbl_goods GS ON GS.g_no = C.g_no
+        LEFT JOIN tbl_goods_image GM ON GM.g_no = C.g_no
+        AND GM.img_no=( SELECT MIN(GM2.img_no)
+        FROM tbl_goods_image GM2
+        WHERE GM2.g_no = C.g_no )
+        WHERE C.m_no = #{m_no}
+        ORDER BY C.cart_no DESC
+    </select>
+
+    <update id="updateCart" parameterType="com.example.mysample.dto.CartVo">
+        UPDATE tbl_cart
+        SET cart_qty = #{cart_qty}
+        WHERE cart_no = #{cart_no}
+    </update>
+
+    <delete id="deleteCartItem">
+        DELETE FROM tbl_cart
+        WHERE cart_no = #{cart_no}
+    </delete>
+
+    <delete id="deleteCheckedCart">
+        DELETE FROM tbl_cart
+        WHERE cart_no IN
+        <foreach collection="cartNos" item="cartNo" open="(" separator="," close=")">
+            #{cartNo}
+        </foreach>
+    </delete>
+
+
+</mapper>

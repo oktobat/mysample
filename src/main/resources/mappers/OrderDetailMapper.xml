@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mysample.mapper.OrderDetailMapper">
+
+    <insert id="insertOrderDetail">
+        INSERT INTO tbl_order_detail (
+        order_no, g_no, order_qty, g_name, g_price,
+        img_url, od_reg_date, od_mod_date, reviewed
+        ) VALUES
+        <foreach collection="orderDetailItems" item="orderDetailItem" separator=",">
+            ( #{order_no}, #{orderDetailItem.g_no},
+            #{orderDetailItem.order_qty}, #{orderDetailItem.g_name},
+            #{orderDetailItem.g_price}, #{orderDetailItem.img_url},
+            now(), now(), 'N' )
+        </foreach>
+    </insert>
+
+    <select id="selectMyOrderDetailList" resultType="com.example.mysample.dto.OrderDetailVo">
+        SELECT * FROM tbl_order_detail
+        WHERE order_no = #{order_no}
+    </select>
+
+    <update id="updateOrderDetailReviewed">
+        UPDATE tbl_order_detail
+        SET reviewed = "Y"
+        WHERE order_detail_no = #{order_detail_no}
+    </update>
+
+</mapper>

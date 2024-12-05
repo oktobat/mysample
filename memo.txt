@@ -1,0 +1,140 @@
+CREATE TABLE `tbl_member` (
+  `m_no` int(11) NOT NULL AUTO_INCREMENT,
+  `m_email` varchar(50) NOT NULL,
+  `m_pw` varchar(200) NOT NULL,
+  `m_name` varchar(20) DEFAULT NULL,
+  `m_gender` char(1) DEFAULT NULL,
+  `m_hp1` varchar(20) DEFAULT NULL,
+  `m_hp2` varchar(20) DEFAULT NULL,
+  `m_hp3` varchar(20) DEFAULT NULL,
+  `m_reg_date` datetime DEFAULT NULL,
+  `m_mod_date` datetime DEFAULT NULL,
+  `m_zipcode` varchar(10) DEFAULT NULL,
+  `m_address` varchar(50) DEFAULT NULL,
+  `m_address_sub` varchar(50) DEFAULT NULL,
+  `m_kakaoId` varchar(255) DEFAULT NULL,
+  `m_googleId` varchar(255) DEFAULT NULL,
+  `m_loginType` enum('LOCAL','GOOGLE','KAKAO') DEFAULT NULL,
+  `m_role` varchar(20) DEFAULT 'ROLE_USER' COMMENT '회원 역할 (ROLE_USER, ROLE_ADMIN)',
+  `m_approval` tinyint(1) DEFAULT 0 COMMENT '승인 상태 (1: 승인됨, 0: 승인 대기)',
+  PRIMARY KEY (`m_no`),
+  UNIQUE KEY `m_email` (`m_email`)
+);
+
+CREATE TABLE `tbl_goods` (
+  `g_no` BIGINT(20) NOT NULL AUTO_INCREMENT,
+  `g_category` varchar(100),
+  `g_type` varchar(50),
+  `g_name` varchar(50) NOT NULL,
+  `g_code` varchar(100),
+  `g_price` BIGINT(20) NOT NULL,
+  `g_inventory` int(11),
+  `g_reg_date` datetime,
+  `g_mod_date` datetime,
+  PRIMARY KEY (`g_no`)
+);
+
+CREATE TABLE `tbl_goods_image` (
+  `img_no` BIGINT(20) NOT NULL AUTO_INCREMENT,
+  `g_no` BIGINT(20) NOT NULL,
+  `img_url` VARCHAR(500) NOT NULL,
+  `img_reg_date` DATETIME,
+  `img_mod_date` DATETIME,
+  PRIMARY KEY (`img_no`),
+  FOREIGN KEY (`g_no`) REFERENCES `tbl_goods`(`g_no`) ON DELETE CASCADE
+);
+
+CREATE TABLE tbl_cart (
+	cart_no BIGINT(20) NOT NULL AUTO_INCREMENT,
+	g_no BIGINT(20) NOT NULL,
+	m_no int(11) NOT NULL,
+	cart_qty int(11) NOT NULL,
+	PRIMARY KEY (cart_no),
+	UNIQUE KEY (g_no, m_no),
+	FOREIGN KEY (g_no) REFERENCES tbl_goods (g_no) ON DELETE CASCADE,
+	FOREIGN KEY (m_no) REFERENCES tbl_member (m_no) ON DELETE CASCADE
+);
+
+// 주문테이블
+CREATE TABLE tbl_order (
+	order_no          BIGINT AUTO_INCREMENT PRIMARY KEY,  	-- 레코드 핵심 번호
+	order_id		  VARCHAR(255) UNIQUE KEY,				-- 주문번호
+	m_no           	  INT,                             		-- 고객번호
+    order_amount      INT,                  				-- 주문 총액
+    shipping_cost     INT,                   				-- 배송비
+    final_amount      INT,                   				-- 최종 결제 금액 (상품 총액 + 배송비)
+    payment_status    VARCHAR(20),                     		-- 결제 상태(결제대기, 결제완료)
+    item_count		  INT,									-- 주문아이템 카운트
+    item_name		  VARCHAR(255),				 			-- 대표아이템 외 몇건
+    receiver_name	  VARCHAR(20),							-- 배송받을 사람 이름
+    receiver_phone 	  VARCHAR(255),                    		-- 배송지 연락처
+    shipping_zipcode  VARCHAR(5),							-- 배송지 우편번호
+    shipping_address  VARCHAR(255),                    		-- 배송 주소
+    shipping_status   VARCHAR(20),                     		-- 배송 상태 (배송준비중, 배송중, 배송완료)
+    shipped_date      DATETIME,                   			-- 배송 완료 날짜
+    order_reg_date    DATETIME,                        		-- 주문 날짜
+    order_mod_date    DATETIME,
+    img_url 		  VARCHAR(255),
+    FOREIGN KEY (m_no) REFERENCES tbl_member (m_no) ON DELETE CASCADE
+);
+
+// 주문상세 테이블
+CREATE TABLE tbl_order_detail (
+	order_detail_no	   BIGINT AUTO_INCREMENT PRIMARY KEY,  	-- 주문 상세 고유번호
+    order_no		   BIGINT,								-- 주문테이블 고유번호
+    g_no         	   BIGINT,                            	-- 상품 ID
+    order_qty          INT,                            		-- 주문한 상품 수량
+    g_name			   VARCHAR(50),							-- 상품명
+    g_price            INT,
+    img_url			   VARCHAR(500),             			-- 상품 단가 (주문 시점의 가격)
+    od_reg_date        DATETIME, 							-- 주문 상세 생성일
+    od_mod_date        DATETIME, 							-- 마지막 업데이트 날짜
+    reviewed		   CHAR(1),
+    FOREIGN KEY (g_no) REFERENCES tbl_goods (g_no),
+	FOREIGN KEY (order_no) REFERENCES tbl_order (order_no) ON DELETE CASCADE
+);
+
+CREATE TABLE tbl_review (
+	review_no	   	   INT AUTO_INCREMENT PRIMARY KEY,
+	comment			   VARCHAR(500),
+	rating 			   INT,
+    g_no         	   BIGINT,
+    order_detail_no	   BIGINT,
+    receipt_detail_no  BIGINT,
+    m_no			   INT,
+    rv_reg_date        DATETIME,
+    rv_mod_date        DATETIME,
+    FOREIGN KEY (g_no) REFERENCES tbl_goods (g_no) ON DELETE CASCADE,
+    FOREIGN KEY (m_no) REFERENCES tbl_member (m_no),
+	FOREIGN KEY (order_detail_no) REFERENCES tbl_order_detail (order_detail_no) ON DELETE SET NULL,
+	FOREIGN KEY (receipt_detail_no) REFERENCES tbl_receipt_detail (receipt_detail_no) ON DELETE SET NULL,
+);
+
+CREATE TABLE tbl_review_image (
+   img_no 			BIGINT(20) AUTO_INCREMENT PRIMARY KEY,
+   review_no    	INT,
+   img_url 			VARCHAR(500),
+   img_reg_date 	DATETIME,
+   img_mod_date 	DATETIME,
+   FOREIGN KEY (review_no) REFERENCES tbl_review (review_no)
+   ON DELETE CASCADE
+);
+
+CREATE TABLE tbl_receipt (
+	receipt_id		   BIGINT(20) PRIMARY KEY,
+	m_no			   INT,
+	total_amount	   INT,
+    rc_reg_date        DATETIME,
+    FOREIGN KEY (m_no) REFERENCES tbl_member (m_no)
+);
+
+CREATE TABLE tbl_receipt_detail (
+	receipt_detail_no  BIGINT AUTO_INCREMENT PRIMARY KEY,
+	receipt_id		   BIGINT(20),
+    g_no         	   BIGINT,
+    rd_reg_date        DATETIME,
+    reviewed		   CHAR(1),
+    FOREIGN KEY (g_no) REFERENCES tbl_goods (g_no) ON DELETE CASCADE,
+	FOREIGN KEY (receipt_id) REFERENCES tbl_receipt (receipt_id) ON DELETE CASCADE
+);
+

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <mappers>
+        <mapper resource="mappers/GoodsMapper.xml" />
+        <mapper resource="mappers/MemberMapper.xml" />
+        <mapper resource="mappers/CartMapper.xml" />
+        <mapper resource="mappers/GoodsImageMapper.xml" />
+        <mapper resource="mappers/OrderMapper.xml" />
+        <mapper resource="mappers/OrderDetailMapper.xml" />
+        <mapper resource="mappers/ReviewMapper.xml" />
+        <mapper resource="mappers/ReviewImageMapper.xml" />
+        <mapper resource="mappers/ReceiptMapper.xml" />
+        <mapper resource="mappers/ReceiptDetailMapper.xml" />
+        <mapper resource="mappers/AdminMapper.xml" />
+    </mappers>
+</configuration>
